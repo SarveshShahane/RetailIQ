@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Annotated, Optional
 from decimal import Decimal
 
-from pydantic import BaseModel, Field, condecimal, conint, model_validator
+from pydantic import BaseModel, Field, condecimal, conint, model_validator, ConfigDict
 
 Money = condecimal(max_digits=12, decimal_places=2, ge=0)
 PositiveInt = conint(gt=0)
@@ -26,8 +26,7 @@ class ProductShort(BaseModel):
     name: str
     selling_price: Decimal
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class InvoiceItemBase(BaseModel):
@@ -35,8 +34,7 @@ class InvoiceItemBase(BaseModel):
     quantity: PositiveInt
     product: Optional[ProductShort] = None
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 
@@ -69,8 +67,7 @@ class CustomerOut(BaseModel):
     phone_number: Optional[str] = None
     email: Optional[str] = None
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class InvoiceResponse(InvoiceBase):
@@ -80,8 +77,7 @@ class InvoiceResponse(InvoiceBase):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class InvoiceMetadata(BaseModel):

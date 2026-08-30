@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 class ChatMessageCreate(BaseModel):
     message: str = Field(..., min_length=1, max_length=2000, description="The chat message content")
@@ -14,13 +14,11 @@ class ChatMessageOut(BaseModel):
     message: str
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class ChatSessionOut(BaseModel):
     session_id: str
     last_message: str
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: CI/CD Pipeline
 
 on:
   push:
@@ -16,13 +16,27 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgrespassword
+          POSTGRES_DB: retailiq_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
       redis:
         image: redis:alpine
         ports:
           - 6379:6379
         options: >-
           --health-cmd "redis-cli ping"
-          --health-interval 10s
+          --health-interval 5s
           --health-timeout 5s
           --health-retries 5
 
@@ -47,6 +61,8 @@ jobs:
 
       - name: Run Backend Pytest Suite
         env:
+          DATABASE_URL: "postgresql+asyncpg://postgres:postgrespassword@localhost:5432/retailiq_test"
+          DB_SSL: "false"
           REDIS_HOST: localhost
           REDIS_PORT: 6379
           REDIS_SSL: "false"
@@ -98,4 +114,4 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: false
-          tags: retailiq-server:latest
+          tags: retailiq-backend:latest
