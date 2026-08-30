@@ -141,3 +141,41 @@ async def test_low_stock_products():
     assert len(low) == 1
     assert low[0]["name"] == "Bread"
     assert low[0]["stock"] == 5
+
+
+@pytest.mark.asyncio
+async def test_numeric_analytics_success():
+    from services.analytics import numeric_analytics
+    db = AsyncMock()
+    biz_mock = BusinessModel(id=1, user_id=10)
+
+    db.execute.side_effect = [
+        mock_db_result(biz_mock),
+        mock_db_result(50000.0),  
+        mock_db_result(10),       
+        mock_db_result(5),        
+    ]
+
+    res = await numeric_analytics(db, current_user_id=10, business_id=1, time="month")
+    assert res["totalSales"] == 50000.0
+    assert res["totalInvoices"] == 10
+    assert res["recentCustomers"] == 5
+
+
+def test_cache_helpers_with_mock_redis():
+    from services.analytics import _get_cache, _set_cache, invalidate_dashboard_cache
+    from unittest.mock import patch
+
+    with patch("services.analytics.redisClient") as mock_redis, patch("services.analytics._is_testing", return_value=False):
+        mock_redis.get.return_value = '{"totalSales": 123.45}'
+        val = _get_cache("dashboard:1:numeric:month")
+        assert val == {"totalSales": 123.45}
+        mock_redis.get.assert_called_once_with("dashboard:1:numeric:month")
+
+        _set_cache("dashboard:1:numeric:month", {"totalSales": 123.45})
+        mock_redis.set.assert_called_once()
+
+        mock_redis.scan_iter.return_value = ["dashboard:1:numeric:month", "dashboard:1:revenue"]
+        invalidate_dashboard_cache(1)
+        mock_redis.delete.assert_called_once_with("dashboard:1:numeric:month", "dashboard:1:revenue")
+

@@ -1,0 +1,16 @@
+renv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+.git/
+.gitignore
+.env
+uploads/*
+!uploads/.gitkeep
+
+renv

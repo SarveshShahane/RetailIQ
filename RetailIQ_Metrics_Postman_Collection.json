@@ -1,0 +1,440 @@
+{
+  "info": {
+    "_postman_id": "8c5fd196-857c-4861-a0a3-d02f5db3e84a",
+    "name": "RetailIQ Metrics & Analytics API",
+    "description": "This Postman collection is designed to test the Metrics and Dashboard Analytics endpoints of the RetailIQ backend. It includes automated token authentication logic using collection variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "System & Utilities",
+      "item": [
+        {
+          "name": "Home Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                ""
+              ]
+            },
+            "description": "Checks if the API server is up and running."
+          },
+          "response": []
+        },
+        {
+          "name": "Database Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/db-health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "db-health"
+              ]
+            },
+            "description": "Verifies if the database connection is healthy."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "User Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access_token) {",
+                  "    pm.collectionVariables.set(\"authToken\", jsonData.access_token);",
+                  "    console.log(\"Saved authToken variable:\", jsonData.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"{{userEmail}}\",\n    \"password\": \"{{userPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in the user and automatically stores the JWT access token in the collection variable `authToken` for subsequent dashboard requests."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Metrics & Dashboard",
+      "item": [
+        {
+          "name": "Numeric Summary Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/?business_id={{businessId}}&time={{timeframe}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "business_id",
+                  "value": "{{businessId}}",
+                  "description": "The ID of the business to query metrics for"
+                },
+                {
+                  "key": "time",
+                  "value": "{{timeframe}}",
+                  "description": "Time duration filter: today, week, month, year, all (Default: month)"
+                }
+              ]
+            },
+            "description": "Returns general numeric metrics including total sales, total invoices count, and recent customer count."
+          },
+          "response": []
+        },
+        {
+          "name": "Revenue Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/revenue?business_id={{businessId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "revenue"
+              ],
+              "query": [
+                {
+                  "key": "business_id",
+                  "value": "{{businessId}}"
+                }
+              ]
+            },
+            "description": "Retrieves the total revenue summary metrics for the business."
+          },
+          "response": []
+        },
+        {
+          "name": "Top Selling Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/top-products?business_id={{businessId}}&limit={{limit}}&days={{days}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "top-products"
+              ],
+              "query": [
+                {
+                  "key": "business_id",
+                  "value": "{{businessId}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "{{limit}}",
+                  "description": "Maximum number of products to return (Default: 5)"
+                },
+                {
+                  "key": "days",
+                  "value": "{{days}}",
+                  "description": "Number of past days to analyze (Default: 30)"
+                }
+              ]
+            },
+            "description": "Retrieves top selling products based on sales volume over the specified number of days."
+          },
+          "response": []
+        },
+        {
+          "name": "Low Stock Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/low-stock?business_id={{businessId}}&threshold={{lowStockThreshold}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "low-stock"
+              ],
+              "query": [
+                {
+                  "key": "business_id",
+                  "value": "{{businessId}}"
+                },
+                {
+                  "key": "threshold",
+                  "value": "{{lowStockThreshold}}",
+                  "description": "Stock count threshold below which a product is considered low stock (Default: 10)"
+                }
+              ]
+            },
+            "description": "Lists products with stock counts below the configured threshold."
+          },
+          "response": []
+        },
+        {
+          "name": "Revenue Trend",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/revenue-trend?business_id={{businessId}}&days={{days}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "revenue-trend"
+              ],
+              "query": [
+                {
+                  "key": "business_id",
+                  "value": "{{businessId}}"
+                },
+                {
+                  "key": "days",
+                  "value": "{{days}}",
+                  "description": "Number of days in the trend period (Default: 30)"
+                }
+              ]
+            },
+            "description": "Returns daily revenue trend details for chart visualization."
+          },
+          "response": []
+        },
+        {
+          "name": "Invoice Status Breakdown",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/invoice-breakdown?business_id={{businessId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "invoice-breakdown"
+              ],
+              "query": [
+                {
+                  "key": "business_id",
+                  "value": "{{businessId}}"
+                }
+              ]
+            },
+            "description": "Returns counts and total amounts grouped by invoice status (e.g. PAID, UNPAID, OVERDUE)."
+          },
+          "response": []
+        },
+        {
+          "name": "Average Order Value",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/avg-order-value?business_id={{businessId}}&days={{days}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "avg-order-value"
+              ],
+              "query": [
+                {
+                  "key": "business_id",
+                  "value": "{{businessId}}"
+                },
+                {
+                  "key": "days",
+                  "value": "{{days}}",
+                  "description": "Number of days to compute average order value over (Default: 30)"
+                }
+              ]
+            },
+            "description": "Returns the average order value calculated over the specified time range."
+          },
+          "response": []
+        },
+        {
+          "name": "Top Customers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/top-customers?business_id={{businessId}}&limit={{limit}}&days={{days}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "top-customers"
+              ],
+              "query": [
+                {
+                  "key": "business_id",
+                  "value": "{{businessId}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "{{limit}}",
+                  "description": "Maximum number of customers to list (Default: 5)"
+                },
+                {
+                  "key": "days",
+                  "value": "{{days}}",
+                  "description": "Number of days to analyze"
+                }
+              ]
+            },
+            "description": "Retrieves the customers with the highest total invoice spending over the specified time range."
+          },
+          "response": []
+        },
+        {
+          "name": "Profit Margins",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/profit-margins?business_id={{businessId}}&days={{days}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "profit-margins"
+              ],
+              "query": [
+                {
+                  "key": "business_id",
+                  "value": "{{businessId}}"
+                },
+                {
+                  "key": "days",
+                  "value": "{{days}}",
+                  "description": "Number of days to calculate profit margins over (Default: 30)"
+                }
+              ]
+            },
+            "description": "Returns gross sales, cost of goods sold, profit amount, and profit margin percentage."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userEmail",
+      "value": "aarav@retailiq.com",
+      "type": "string"
+    },
+    {
+      "key": "userPassword",
+      "value": "Password123",
+      "type": "string"
+    },
+    {
+      "key": "businessId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "timeframe",
+      "value": "month",
+      "type": "string"
+    },
+    {
+      "key": "limit",
+      "value": "5",
+      "type": "string"
+    },
+    {
+      "key": "days",
+      "value": "30",
+      "type": "string"
+    },
+    {
+      "key": "lowStockThreshold",
+      "value": "10",
+      "type": "string"
+    }
+  ]
+}

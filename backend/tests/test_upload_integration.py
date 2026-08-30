@@ -7,7 +7,6 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi.testclient import TestClient
 
-# Import all models to register them in Base
 import models.user
 import models.products
 import models.invoice
@@ -18,7 +17,6 @@ from app import app
 from db.database import get_async_db
 from middlewares.auth import auth, current_user
 
-# 1. Dependency Override Setup
 def mock_current_user():
     return 10
 
@@ -32,7 +30,6 @@ def reset_overrides():
     yield
     app.dependency_overrides.clear()
 
-# 2. Upload Endpoint Tests
 @patch("routes.upload._save_file")
 def test_integration_upload_avatar_success(mock_save):
     mock_save.return_value = "/uploads/avatars/test_avatar.png"

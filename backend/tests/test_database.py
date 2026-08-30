@@ -7,7 +7,6 @@ import pytest
 from importlib import reload
 
 def test_db_url_conversion_logic():
-    # Test cases for the URL parsing replacement rule
     convert_url = lambda url: url.replace("postgresql+asyncpg://", "postgresql://", 1) if url.startswith("postgresql+asyncpg://") else url
 
     assert convert_url("postgresql+asyncpg://postgres:pass@localhost/db") == "postgresql://postgres:pass@localhost/db"

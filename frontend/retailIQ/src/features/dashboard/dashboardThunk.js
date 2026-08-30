@@ -33,7 +33,7 @@ export const fetchDashboardData = createAsyncThunk(
           params: { business_id: businessId, limit: 5, days },
         }),
         api.get("/dashboard/low-stock", {
-          params: { business_id: selectedBusinessId => { }, business_id: businessId, threshold: 10 },
+          params: { business_id: businessId, threshold: 10 },
         }),
         api.get("/dashboard/revenue-trend", {
           params: { business_id: businessId, days },

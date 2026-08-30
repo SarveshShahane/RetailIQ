@@ -8,25 +8,21 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from dotenv import load_dotenv
 
-from models.user import Business
+from models.user import Business, User
 from models.ai import ChatMessage
+from models.products import Product
+from models.invoice import Customer, CustomerAddress, Payment, Invoice, InvoiceItem
 
 from langchain_community.utilities import SQLDatabase
 from langchain_ollama import ChatOllama
 from langchain_groq import ChatGroq
 from langchain_community.agent_toolkits import create_sql_agent
 
-load_dotenv()
-
-DATABASE_URL = os.getenv("DATABASE_URL")
-if not DATABASE_URL:
-    raise ValueError("DATABASE_URL is not set in environment variables")
-
-sync_db_url = DATABASE_URL.replace("postgresql+asyncpg", "postgresql")
+from db.database import sync_url, sync_connect_args
 
 current_business_id_var = contextvars.ContextVar("current_business_id", default=None)
 
-chatbot_engine = create_engine(sync_db_url, pool_pre_ping=True)
+chatbot_engine = create_engine(sync_url, pool_pre_ping=True, connect_args=sync_connect_args)
 
 @event.listens_for(chatbot_engine, "checkout")
 def set_connection_rls_variables(dbapi_connection, connection_record, connection_proxy):
@@ -69,8 +65,8 @@ def reset_connection_rls_variables(dbapi_connection, connection_record):
         pass
 
 
-llm=ChatGroq(
-    model='llama-3.1-8b-instant',
+llm = ChatGroq(
+    model=os.getenv('GROQ_MODEL', 'openai/gpt-oss-120b'),
     api_key=os.getenv('GROQ_API_KEY')
 )
 PREFIX_PROMPT = """You are a helpful PostgreSQL query agent for the RetailIQ database.
@@ -130,12 +126,9 @@ def get_agent_executor():
         _agent_executor = create_sql_agent(
             llm=llm,
             db=_db_utility,
-            agent_type="zero-shot-react-description",
+            agent_type="tool-calling",
             verbose=True,
-            prefix=PREFIX_PROMPT,
-            suffix=SUFFIX_PROMPT,
             handle_parsing_errors=True,
-            return_intermediate_steps=True,
         )
     return _agent_executor
 

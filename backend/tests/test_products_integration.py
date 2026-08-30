@@ -9,7 +9,6 @@ from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi.testclient import TestClient
 
-# Import all models to register them in Base
 import models.user
 import models.products
 import models.invoice
@@ -22,7 +21,6 @@ from middlewares.auth import auth, current_user
 from models.user import Business as BusinessModel
 from models.products import Product as ProductModel
 
-# 1. Dependency Override Setup
 db_mock = None
 
 async def override_get_async_db():
@@ -60,14 +58,12 @@ def reset_db_mock():
     yield
     app.dependency_overrides.clear()
 
-# 2. Products Endpoint Tests
 def test_integration_list_products():
     biz_mock = BusinessModel(id=1, user_id=10, name="My Shop")
     prods = [
         ProductModel(id=100, name="Milk", business_id=1, original_price=Decimal("50"), selling_price=Decimal("45"), stock=10, created_at=datetime.utcnow(), updated_at=datetime.utcnow()),
         ProductModel(id=101, name="Bread", business_id=1, original_price=Decimal("30"), selling_price=Decimal("25"), stock=5, created_at=datetime.utcnow(), updated_at=datetime.utcnow())
     ]
-    # Verify business, list products, count products
     db_mock.execute.side_effect = [
         mock_db_result(biz_mock),
         mock_db_result(prods),

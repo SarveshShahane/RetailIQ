@@ -9,12 +9,10 @@ from fastapi import HTTPException, UploadFile
 from routes.upload import _validate_image, _save_file
 from pathlib import Path
 
-# 1. Validation Tests
 def test_validate_image_allowed():
     file = MagicMock(spec=UploadFile)
     file.filename = "pic.png"
     file.content_type = "image/png"
-    # Should not raise any exception
     _validate_image(file)
 
 def test_validate_image_missing_filename():
@@ -44,14 +42,12 @@ def test_validate_image_disallowed_content_type():
     assert excinfo.value.status_code == 400
     assert "Only image files" in excinfo.value.detail
 
-# 2. File Size and Saving Tests
 @pytest.mark.asyncio
 async def test_save_file_size_exceeded():
     file = MagicMock(spec=UploadFile)
     file.filename = "pic.png"
     file.content_type = "image/png"
     
-    # Mock file.read to return data larger than 5 MB
     large_data = b"0" * (5 * 1024 * 1024 + 1)
     file.read = AsyncMock(return_value=large_data)
     
@@ -69,13 +65,11 @@ async def test_save_file_success(mock_mkdir, mock_open):
     file.content_type = "image/png"
     file.read = AsyncMock(return_value=b"fake image data")
     
-    # Mock open write operations
     mock_file_handle = MagicMock()
     mock_open.return_value.__enter__.return_value = mock_file_handle
     
     dest_dir = Path("dummy_dest")
     
-    # Patch BASE_DIR relative to avoid path mismatch issues
     with patch("routes.upload.BASE_DIR", Path(".")):
         url_path = await _save_file(file, dest_dir)
         assert url_path.endswith(".png")

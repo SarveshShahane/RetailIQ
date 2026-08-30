@@ -1,0 +1,49 @@
+services:
+  redis:
+    image: redis:alpine
+    container_name: retailiq-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - retailiq-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: retailiq-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=
+      - REDIS_USERNAME=
+      - REDIS_SSL=false
+      - REDIS_DECODE_RESPONSES=true
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - retailiq-network
+    depends_on:
+      redis:
+        condition: service_healthy
+
+volumes:
+  redis_data:
+    driver: local
+
+networks:
+  retailiq-network:
+    driver: bridge

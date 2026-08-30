@@ -8,7 +8,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi.testclient import TestClient
 from datetime import datetime
 
-# Import all models to register them in Base
 import models.user
 import models.products
 import models.invoice
@@ -20,7 +19,6 @@ from db.database import get_async_db
 from middlewares.auth import auth, current_user
 from models.user import User as UserModel, Business as BusinessModel
 
-# 1. Dependency Override Setup
 db_mock = None
 
 async def override_get_async_db():
@@ -57,7 +55,6 @@ def reset_db_mock():
     yield
     app.dependency_overrides.clear()
 
-# 2. User Profile Endpoint Tests
 def test_integration_get_user_profile():
     user = UserModel(
         id=10,
@@ -75,7 +72,6 @@ def test_integration_get_user_profile():
     assert res_data["name"] == "Integration User"
 
 def test_integration_update_user_profile():
-    # Setup load, update, and reload calls
     user_mock = UserModel(
         id=10,
         email="old@example.com",
@@ -103,10 +99,8 @@ def test_integration_update_user_profile():
     assert res_data["email"] == "updated@example.com"
     assert db_mock.commit.call_count >= 1
 
-# 3. Store / Business Endpoint Tests
 def test_integration_create_business_success():
     biz_mock = BusinessModel(id=50, user_id=10, name="My Shop")
-    # Verify no GST, then refresh id
     db_mock.execute.return_value = mock_db_result(None)
     
     def mock_refresh(instance):

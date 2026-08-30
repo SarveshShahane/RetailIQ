@@ -27,7 +27,7 @@ class ProductShort(BaseModel):
     selling_price: Decimal
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 class InvoiceItemBase(BaseModel):
@@ -36,7 +36,7 @@ class InvoiceItemBase(BaseModel):
     product: Optional[ProductShort] = None
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 
@@ -70,7 +70,7 @@ class CustomerOut(BaseModel):
     email: Optional[str] = None
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 class InvoiceResponse(InvoiceBase):
@@ -81,7 +81,7 @@ class InvoiceResponse(InvoiceBase):
     updated_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 class InvoiceMetadata(BaseModel):

@@ -197,6 +197,16 @@ const Products = () => {
       <span className="field-error">{errs[fieldName]}</span>
     ) : null;
   };
+
+  const totalProducts = products?.length || 0;
+  const totalStock = products?.reduce((acc, p) => acc + (Number(p.stock) || 0), 0) || 0;
+  const totalInventoryValue = products?.reduce(
+    (acc, p) => acc + (Number(p.stock) || 0) * (Number(p.selling_price) || 0),
+    0
+  ) || 0;
+  const lowStockCount = products?.filter((p) => (Number(p.stock) || 0) <= 10).length || 0;
+  const outOfStockCount = products?.filter((p) => (Number(p.stock) || 0) === 0).length || 0;
+
   const inputClass = (fieldName, formType = "add", base = "form-input") => {
     const errs = formType === "add" ? addErrors : editErrors;
     const tch = formType === "add" ? addTouched : editTouched;
@@ -240,6 +250,119 @@ const Products = () => {
                 </button>
               )}
             </div>
+
+            {/* KPI Cards Section */}
+            {!showAddForm && !editingProduct && (
+              <div className="stats-grid">
+                {loading && products.length === 0 ? (
+                  <>
+                    <div className="stat-card stat-card-skeleton">
+                      <div className="stat-icon skeleton-pulse" style={{ width: "44px", height: "44px" }} />
+                      <div className="stat-content" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
+                        <div className="skeleton-pulse" style={{ width: "70px", height: "12px" }} />
+                        <div className="skeleton-pulse" style={{ width: "100px", height: "24px" }} />
+                        <div className="skeleton-pulse" style={{ width: "80px", height: "10px" }} />
+                      </div>
+                    </div>
+                    <div className="stat-card stat-card-skeleton">
+                      <div className="stat-icon skeleton-pulse" style={{ width: "44px", height: "44px" }} />
+                      <div className="stat-content" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
+                        <div className="skeleton-pulse" style={{ width: "70px", height: "12px" }} />
+                        <div className="skeleton-pulse" style={{ width: "100px", height: "24px" }} />
+                        <div className="skeleton-pulse" style={{ width: "80px", height: "10px" }} />
+                      </div>
+                    </div>
+                    <div className="stat-card stat-card-skeleton">
+                      <div className="stat-icon skeleton-pulse" style={{ width: "44px", height: "44px" }} />
+                      <div className="stat-content" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
+                        <div className="skeleton-pulse" style={{ width: "70px", height: "12px" }} />
+                        <div className="skeleton-pulse" style={{ width: "100px", height: "24px" }} />
+                        <div className="skeleton-pulse" style={{ width: "80px", height: "10px" }} />
+                      </div>
+                    </div>
+                    <div className="stat-card stat-card-skeleton">
+                      <div className="stat-icon skeleton-pulse" style={{ width: "44px", height: "44px" }} />
+                      <div className="stat-content" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
+                        <div className="skeleton-pulse" style={{ width: "70px", height: "12px" }} />
+                        <div className="skeleton-pulse" style={{ width: "100px", height: "24px" }} />
+                        <div className="skeleton-pulse" style={{ width: "80px", height: "10px" }} />
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="stat-card">
+                      <div className="stat-icon stat-icon-products">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                          <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                          <line x1="12" y1="22.08" x2="12" y2="12" />
+                        </svg>
+                      </div>
+                      <div className="stat-content">
+                        <span className="stat-label">Total Products</span>
+                        <span className="stat-value">{totalProducts}</span>
+                        <span style={{ fontSize: "0.75rem", color: "var(--slate-400)", marginTop: "4px", fontWeight: 500 }}>
+                          Distinct catalog items
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="stat-card">
+                      <div className="stat-icon stat-icon-orders">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                          <polyline points="2 17 12 22 22 17" />
+                          <polyline points="2 12 12 17 22 12" />
+                        </svg>
+                      </div>
+                      <div className="stat-content">
+                        <span className="stat-label">Total Stock</span>
+                        <span className="stat-value">{totalStock.toLocaleString("en-IN")}</span>
+                        <span style={{ fontSize: "0.75rem", color: "var(--slate-400)", marginTop: "4px", fontWeight: 500 }}>
+                          Units in inventory
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="stat-card">
+                      <div className="stat-icon stat-icon-revenue">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <line x1="12" y1="1" x2="12" y2="23" />
+                          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        </svg>
+                      </div>
+                      <div className="stat-content">
+                        <span className="stat-label">Inventory Value</span>
+                        <span className="stat-value">{formatCurrency(totalInventoryValue)}</span>
+                        <span style={{ fontSize: "0.75rem", color: "var(--slate-400)", marginTop: "4px", fontWeight: 500 }}>
+                          Total retail stock value
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="stat-card">
+                      <div className="stat-icon" style={{ backgroundColor: lowStockCount > 0 ? "var(--danger-50)" : "var(--success-50)", color: lowStockCount > 0 ? "var(--danger-600)" : "var(--success-600)" }}>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                          <line x1="12" y1="9" x2="12" y2="13" />
+                          <line x1="12" y1="17" x2="12.01" y2="17" />
+                        </svg>
+                      </div>
+                      <div className="stat-content">
+                        <span className="stat-label">Low Stock</span>
+                        <span className="stat-value" style={{ color: lowStockCount > 0 ? "var(--danger-600)" : "inherit" }}>
+                          {lowStockCount}
+                        </span>
+                        <span style={{ fontSize: "0.75rem", color: lowStockCount > 0 ? "var(--danger-500)" : "var(--slate-400)", marginTop: "4px", fontWeight: 500 }}>
+                          {outOfStockCount > 0 ? `${outOfStockCount} out of stock` : "Threshold ≤ 10 units"}
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
             { }
             {error && (
               <div className="auth-error mb-4">

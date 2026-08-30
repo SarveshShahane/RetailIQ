@@ -4,10 +4,17 @@ from dotenv import load_dotenv
 import asyncio
 load_dotenv()
 
-redisClient=redis.Redis(host=os.getenv("REDIS_HOST"),
-    port=int(os.getenv("REDIS_PORT")),
-    decode_responses=bool(os.getenv('REDIS_DECODE_RESPONSES')),
-    username=os.getenv("REDIS_USERNAME"),
-    password=os.getenv('REDIS_PASSWORD'),
-    )  
+redis_port = int(os.getenv("REDIS_PORT", 6379))
+redis_ssl = os.getenv("REDIS_SSL", "false").lower() in ("true", "1", "yes") or redis_port == 6380
+
+redisClient = redis.Redis(
+    host=os.getenv("REDIS_HOST", "localhost"),
+    port=redis_port,
+    decode_responses=bool(os.getenv("REDIS_DECODE_RESPONSES", "true")),
+    username=os.getenv("REDIS_USERNAME") or None,
+    password=os.getenv("REDIS_PASSWORD") or None,
+    ssl=redis_ssl,
+    socket_timeout=5,
+    socket_connect_timeout=5,
+)
 

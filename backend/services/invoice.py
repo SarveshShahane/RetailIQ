@@ -13,6 +13,7 @@ from models.invoice import Customer, Invoice, InvoiceItem, InvoiceSource, Invoic
 from models.products import Product
 from models.user import Business
 from services.products import _get_business_for_user
+from services.analytics import invalidate_dashboard_cache
 from schemas.invoice import (
 	InvoiceCreatePayload,
 	InvoiceMetadata,
@@ -195,6 +196,7 @@ async def create_invoice(
 				product.stock -= quantity
 
 		await db.commit()
+		invalidate_dashboard_cache(invoice.business_id)
 		result = await db.execute(
 			select(Invoice)
 			.options(
@@ -323,6 +325,7 @@ async def update_invoice(
 			setattr(invoice, key, value)
 
 		await db.commit()
+		invalidate_dashboard_cache(invoice.business_id)
 		result = await db.execute(
 			select(Invoice)
 			.options(

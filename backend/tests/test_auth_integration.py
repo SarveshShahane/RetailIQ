@@ -8,7 +8,6 @@ from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi.testclient import TestClient
 
-# Import all models to register them in Base
 import models.user
 import models.products
 import models.invoice
@@ -20,7 +19,6 @@ from db.database import get_async_db
 from models.user import User as UserModel
 from services.auth import hash_password
 
-# 1. Dependency Override Setup
 db_mock = None
 
 async def override_get_async_db():
@@ -44,7 +42,6 @@ def reset_db_mock():
     yield
     app.dependency_overrides.clear()
 
-# 2. Registration Integration Tests
 def test_integration_register_success():
     db_mock.execute.return_value = mock_db_result(None)
     
@@ -87,7 +84,6 @@ def test_integration_register_email_taken():
     res_data = response.json()
     assert "already registered" in res_data["detail"].lower()
 
-# 3. Login Integration Tests
 def test_integration_login_success():
     hashed = hash_password("SecurePassword123")
     user = UserModel(id=10, email="user@example.com", name="User", password=hashed)
@@ -110,7 +106,6 @@ def test_integration_login_success():
     assert db_mock.commit.call_count >= 1
 
 def test_integration_login_invalid_credentials():
-    # User not found in DB
     db_mock.execute.return_value = mock_db_result(None)
     
     response = client.post(

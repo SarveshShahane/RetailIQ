@@ -9,7 +9,6 @@ from fastapi import HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 from middlewares.auth import auth, current_user
 
-# 1. Custom Auth Dependency Tests
 @pytest.mark.asyncio
 @patch("middlewares.auth.current_user")
 async def test_auth_success(mock_current_user):
@@ -31,7 +30,6 @@ async def test_auth_forbidden(mock_current_user):
     assert excinfo.value.status_code == 403
     assert "not allowed to access" in excinfo.value.detail
 
-# 2. current_user Dependency Tests
 @pytest.mark.asyncio
 async def test_current_user_no_credentials():
     with pytest.raises(HTTPException) as excinfo:

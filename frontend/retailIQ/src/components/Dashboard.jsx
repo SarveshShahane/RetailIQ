@@ -238,6 +238,41 @@ const RevenueTrendChart = ({ data, formatCurrency, formatDateLabel }) => {
     </div>
   );
 };
+const KPICardSkeleton = () => (
+  <div className="stat-card stat-card-skeleton">
+    <div className="stat-icon skeleton-pulse" style={{ width: "44px", height: "44px" }} />
+    <div className="stat-content" style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
+      <div className="skeleton-pulse" style={{ width: "70px", height: "12px" }} />
+      <div className="skeleton-pulse" style={{ width: "120px", height: "24px" }} />
+      <div className="skeleton-pulse" style={{ width: "90px", height: "10px" }} />
+    </div>
+  </div>
+);
+
+const DashboardSkeleton = () => (
+  <>
+    <div className="stats-grid">
+      <KPICardSkeleton />
+      <KPICardSkeleton />
+      <KPICardSkeleton />
+      <KPICardSkeleton />
+      <KPICardSkeleton />
+    </div>
+    <div className="analytics-grid-2-1">
+      <div className="chart-card stat-card-skeleton" style={{ minHeight: "300px", display: "flex", flexDirection: "column", gap: "16px" }}>
+        <div className="skeleton-pulse" style={{ width: "140px", height: "18px" }} />
+        <div className="skeleton-pulse" style={{ width: "100%", flex: 1, borderRadius: "var(--radius-md)" }} />
+      </div>
+      <div className="status-breakdown-card stat-card-skeleton" style={{ minHeight: "300px", display: "flex", flexDirection: "column", gap: "16px" }}>
+        <div className="skeleton-pulse" style={{ width: "160px", height: "18px" }} />
+        <div className="skeleton-pulse" style={{ width: "100%", height: "44px" }} />
+        <div className="skeleton-pulse" style={{ width: "100%", height: "44px" }} />
+        <div className="skeleton-pulse" style={{ width: "100%", height: "44px" }} />
+      </div>
+    </div>
+  </>
+);
+
 const Dashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -296,10 +331,17 @@ const Dashboard = () => {
     <div className="dashboard-page">
       <main className="dashboard-main">
         {loading && businesses.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "40px" }}>
-            <span className="spinner" style={{ display: "inline-block" }} />
-            <p style={{ marginTop: "12px", color: "var(--slate-500)" }}>Loading businesses...</p>
-          </div>
+          <>
+            <div className="flex-between mb-6" style={{ flexWrap: "wrap", gap: "16px" }}>
+              <div className="dashboard-header" style={{ marginBottom: 0 }}>
+                <h1 className="dashboard-greeting" id="dashboard-greeting">
+                  {greeting()}, {user?.name?.split(" ")[0] || "there"}!
+                </h1>
+                <p className="dashboard-tagline">Loading your business insights...</p>
+              </div>
+            </div>
+            <DashboardSkeleton />
+          </>
         ) : businesses.length === 0 ? (
           <div className="empty-state-card">
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--slate-400)" strokeWidth="1.5">
@@ -351,12 +393,7 @@ const Dashboard = () => {
                 </select>
               </div>
             </div>
-            {analyticsLoading && (
-              <div style={{ textAlign: "center", padding: "80px 0" }}>
-                <span className="spinner" style={{ display: "inline-block" }} />
-                <p style={{ marginTop: "12px", color: "var(--slate-500)" }}>Loading dashboard insights...</p>
-              </div>
-            )}
+            {analyticsLoading && <DashboardSkeleton />}
             {analyticsError && !analyticsLoading && (
               <div style={{
                 textAlign: "center",

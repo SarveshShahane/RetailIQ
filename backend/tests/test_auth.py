@@ -8,7 +8,6 @@ import jwt
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi import HTTPException, status
-# Import all models to register them in SQLAlchemy Base registry before compilation
 import models.user
 import models.products
 import models.invoice

@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from models.products import Product as ProductModel
 from models.user import Business
 from schemas.products import ProductCreate, ProductUpdate
+from services.analytics import invalidate_dashboard_cache
 
 
 async def _get_business_for_user(
@@ -154,6 +155,7 @@ async def create_product(
 		)
 		db.add(product)
 		await db.commit()
+		invalidate_dashboard_cache(product.business_id)
 		await db.refresh(product)
 		return product
 	except IntegrityError as exc:
@@ -186,6 +188,7 @@ async def update_product(
 		for key, value in update_data.items():
 			setattr(product, key, value)
 		await db.commit()
+		invalidate_dashboard_cache(product.business_id)
 		await db.refresh(product)
 		return product
 	except IntegrityError as exc:
@@ -213,8 +216,10 @@ async def delete_product(
 		raise ProductNotFound()
 	await _get_business_for_user(db, product.business_id, current_user_id)
 	try:
+		business_id = product.business_id
 		await db.delete(product)
 		await db.commit()
+		invalidate_dashboard_cache(business_id)
 	except Exception as exc:
 		await db.rollback()
 		raise DatabaseUnexpectedException(

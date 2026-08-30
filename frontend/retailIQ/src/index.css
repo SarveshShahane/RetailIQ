@@ -591,6 +591,29 @@ body {
   color: var(--slate-900);
 }
 
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.skeleton-pulse {
+  animation: skeleton-pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  background-color: var(--slate-200);
+  border-radius: var(--radius-sm);
+}
+
+body.dark .skeleton-pulse {
+  background-color: #262c36 !important;
+}
+
+.stat-card-skeleton {
+  pointer-events: none;
+}
+
 .actions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
