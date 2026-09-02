@@ -70,6 +70,11 @@ jobs:
           REDIS_SSL: "false"
           SECRET_KEY: test_secret_key_ci_12345
           GROQ_API_KEY: mock_groq_key
+          SMTP_HOST: localhost
+          SMTP_PORT: 1025
+          SMTP_USERNAME: test
+          SMTP_PASSWORD: test
+          SMTP_FROM_EMAIL: test@example.com
         run: |
           pytest -v
 
