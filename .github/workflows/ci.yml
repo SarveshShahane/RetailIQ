@@ -125,6 +125,6 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: ./backend
-          file: ./backend/docker-compose
+          file: ./backend/Dockerfile
           push: true
           tags: ${{vars.DOCKERHUB_USERNAME }}/retailiq-server:latest
