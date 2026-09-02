@@ -19,6 +19,11 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgrespassword
           POSTGRES_DB: retailiq_test
+          SMTP_HOST: localhost
+          SMTP_PORT: "1025"
+          SMTP_USERNAME: test
+          SMTP_PASSWORD: test
+          SMTP_FROM_EMAIL: test@example.com
         ports:
           - 5432:5432
         options: >-
